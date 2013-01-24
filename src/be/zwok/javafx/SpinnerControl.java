@@ -14,9 +14,8 @@ import javafx.scene.control.LabelBuilder;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPaneBuilder;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
+import javafx.scene.paint.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.RectangleBuilder;
 import javafx.util.Duration;
@@ -32,25 +31,29 @@ public class SpinnerControl extends AnchorPane {
     private ScrollPane valueScrollPane;
     private ObservableList<String> valueList = null;
     private double itemHeight = 0.0;
+    private Rectangle bottomRectangle;
+    private Rectangle topRectangle;
     private Timeline timeline = new Timeline();
+
 
     public SpinnerControl() {
         this.getStyleClass().add("spinner-control");
         createLayout();
         registerBehaviour();
-
     }
 
     private void createLayout() {
-        this.setStyle("-fx-background-color: transparent;");
         this.setPrefSize(50, 150);
 
+        bottomRectangle = RectangleBuilder.create().disable(true).width(10).height(10).fill(Color.rgb(128, 128, 128)).build();
+        topRectangle = RectangleBuilder.create().disable(true).width(10).height(10).fill(Color.rgb(128, 128, 128)).build();
 
         Region rect1 = RegionBuilder.create().style("-fx-background-color: #000000").opacity(0.2).prefHeight(2).build();
         Region rect2 = RegionBuilder.create().style("-fx-background-color: #000000").opacity(0.8).prefHeight(2).build();
         Region rect3 = RegionBuilder.create().style("-fx-background-color: #000000").opacity(0.8).prefHeight(2).build();
         Region rect4 = RegionBuilder.create().style("-fx-background-color: #000000").opacity(0.2).prefHeight(2).build();
         overlayVBox = VBoxBuilder.create().fillWidth(true).children(rect1, rect2, rect3, rect4).disable(true).build();
+        overlayVBox.setStyle("-fx-background-color: transparent;");
 
         valueVBox = VBoxBuilder.create().fillWidth(true).spacing(2).alignment(Pos.CENTER).build();
         valueVBox.setStyle("-fx-background-color: transparent;");
@@ -58,7 +61,11 @@ public class SpinnerControl extends AnchorPane {
         valueScrollPane = ScrollPaneBuilder.create().prefHeight(100).content(valueVBox).vbarPolicy(ScrollPane.ScrollBarPolicy.NEVER).hbarPolicy(ScrollPane.ScrollBarPolicy.NEVER).pannable(true).fitToWidth(true).build();
         valueScrollPane.setStyle("-fx-background-color: transparent;");
 
-        this.getChildren().addAll(valueScrollPane, overlayVBox);
+        this.getChildren().addAll(bottomRectangle, valueScrollPane, overlayVBox, topRectangle);
+        this.setBottomAnchor(bottomRectangle, 0.0);
+        this.setTopAnchor(bottomRectangle, 0.0);
+        this.setLeftAnchor(bottomRectangle, 0.0);
+        this.setRightAnchor(bottomRectangle, 0.0);
         this.setBottomAnchor(valueScrollPane, 0.0);
         this.setTopAnchor(valueScrollPane, 0.0);
         this.setLeftAnchor(valueScrollPane, 0.0);
@@ -67,6 +74,8 @@ public class SpinnerControl extends AnchorPane {
         this.setTopAnchor(overlayVBox, 0.0);
         this.setLeftAnchor(overlayVBox, 0.0);
         this.setRightAnchor(overlayVBox, 0.0);
+
+        setFill(new Color(0.5,0.5,0.5,1.0));
     }
 
     private void registerBehaviour() {
@@ -85,6 +94,20 @@ public class SpinnerControl extends AnchorPane {
                 }
             }
         });
+
+        bottomRectangle.widthProperty().bind(widthProperty());
+        bottomRectangle.heightProperty().bind(heightProperty());
+        topRectangle.widthProperty().bind(widthProperty());
+        topRectangle.heightProperty().bind(heightProperty());
+    }
+
+    public void setFill(Color color) {
+        bottomRectangle.setFill(color);
+        Color transparantColor = new Color(color.getRed(), color.getGreen(), color.getBlue(), 0.0);
+        Stop[] stops = new Stop[] { new Stop(0, color), new Stop(0.5, transparantColor), new Stop(1, color)};
+        LinearGradient lg = new LinearGradient(0, 0, 0, 1, true, CycleMethod.NO_CYCLE, stops);
+        topRectangle.setFill(lg);
+
     }
 
     public ObservableList<String> getItems() {
@@ -137,17 +160,17 @@ public class SpinnerControl extends AnchorPane {
         Label label = null;
         valueVBox.getChildren().clear();
         if (valueList != null) {
-            label = LabelBuilder.create().text("").alignment(Pos.CENTER).build();
+            label = LabelBuilder.create().text("").style("-fx-background-color: transparent;").alignment(Pos.CENTER).build();
             valueVBox.getChildren().add(label);
-            label = LabelBuilder.create().text("").alignment(Pos.CENTER).build();
+            label = LabelBuilder.create().text("").style("-fx-background-color: transparent;").alignment(Pos.CENTER).build();
             valueVBox.getChildren().add(label);
             for (String value : valueList) {
-                label = LabelBuilder.create().text(value).alignment(Pos.CENTER).build();
+                label = LabelBuilder.create().text(value).style("-fx-background-color: transparent;").alignment(Pos.CENTER).build();
                 valueVBox.getChildren().add(label);
             }
-            label = LabelBuilder.create().text("").alignment(Pos.CENTER).build();
+            label = LabelBuilder.create().text("").style("-fx-background-color: transparent;").alignment(Pos.CENTER).build();
             valueVBox.getChildren().add(label);
-            label = LabelBuilder.create().text("").alignment(Pos.CENTER).build();
+            label = LabelBuilder.create().text("").style("-fx-background-color: transparent;").alignment(Pos.CENTER).build();
             valueVBox.getChildren().add(label);
         }
         if (label != null) {
@@ -158,8 +181,10 @@ public class SpinnerControl extends AnchorPane {
                     overlayVBox.setSpacing(itemHeight);
                     overlayVBox.setPadding(new Insets(itemHeight, 0, itemHeight, 0));
                     setPrefHeight(overlayVBox.getPrefHeight());
+                    goToItem(getItem());
                 }
             });
         }
+
     }
 }

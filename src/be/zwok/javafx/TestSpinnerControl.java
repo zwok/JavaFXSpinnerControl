@@ -1,6 +1,5 @@
 package be.zwok.javafx;
 
-import com.javafx.experiments.scenicview.ScenicView;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -14,27 +13,15 @@ import javafx.scene.Scene;
 import javafx.scene.SceneBuilder;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBuilder;
-import javafx.scene.control.Label;
-import javafx.scene.control.LabelBuilder;
-import javafx.scene.effect.BlendMode;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.HBoxBuilder;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.StackPaneBuilder;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.CycleMethod;
-import javafx.scene.paint.LinearGradient;
-import javafx.scene.paint.Stop;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
-
 import java.text.DateFormatSymbols;
-import java.util.Date;
 
 /**
  * Simul
  * Author: Yannick Kalokerinos
- * Institution: Universiteit Hasselt
  * Date: 24/01/13
  */
 public class TestSpinnerControl extends Application {
@@ -51,7 +38,7 @@ public class TestSpinnerControl extends Application {
     @Override
     public void start(Stage stage) throws Exception {
         Parent root = createLayout();
-        scene = SceneBuilder.create().root(root).width(600).height(400).build();
+        scene = SceneBuilder.create().fill(new Color(0.5,0.5,0.5,1.0)).root(root).width(600).height(400).build();
         stage.setScene(scene);
         stage.show();
 
@@ -70,22 +57,23 @@ public class TestSpinnerControl extends Application {
         spinnerControlMonth.setItems(monthList);
         spinnerControlYear.setItems(yearList);
 
-        //ScenicView.show(scene);
     }
 
     private Parent createLayout() {
         spinnerControlDay = new SpinnerControl();
-        spinnerControlDay.setStyle("-fx-font-size: 20");
+        spinnerControlDay.setStyle("-fx-font-size: 22;");
         spinnerControlMonth = new SpinnerControl();
-        spinnerControlMonth.setStyle("-fx-font-size: 20");
+        spinnerControlMonth.setStyle("-fx-font-size: 22");
+        spinnerControlMonth.setPrefWidth(200);
         spinnerControlYear = new SpinnerControl();
-        spinnerControlYear.setStyle("-fx-font-size: 20");
+        spinnerControlMonth.setPrefWidth(120);
+        spinnerControlYear.setStyle("-fx-font-size: 22");
         Button button = ButtonBuilder.create().onAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
                 ((Button) actionEvent.getSource()).setText(spinnerControlDay.getItem());
             }
-        }).prefHeight(50).text("GO").build();
+        }).prefHeight(50).text("Get selected value").build();
         HBox hBox = HBoxBuilder.create().fillHeight(false).children(spinnerControlDay, spinnerControlMonth, spinnerControlYear, button).spacing(25).alignment(Pos.CENTER).build();
 
 
