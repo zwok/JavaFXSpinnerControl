@@ -19,6 +19,7 @@ local.properties
 *.jar
 *.war
 *.ear
+*.iml
 out/
 build/
 # External tool builders
