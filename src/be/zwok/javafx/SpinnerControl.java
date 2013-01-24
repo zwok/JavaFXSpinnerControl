@@ -180,7 +180,7 @@ public class SpinnerControl extends AnchorPane {
                     itemHeight = number1.doubleValue();
                     overlayVBox.setSpacing(itemHeight);
                     overlayVBox.setPadding(new Insets(itemHeight, 0, itemHeight, 0));
-                    setPrefHeight(overlayVBox.getPrefHeight());
+                    setPrefHeight(itemHeight * 5 + 8);
                     goToItem(getItem());
                 }
             });
