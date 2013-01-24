@@ -83,7 +83,7 @@ public class TestSpinnerControl extends Application {
         Button button = ButtonBuilder.create().onAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent actionEvent) {
-                spinnerControlDay.goToItem("31");
+                ((Button) actionEvent.getSource()).setText(spinnerControlDay.getItem());
             }
         }).prefHeight(50).text("GO").build();
         HBox hBox = HBoxBuilder.create().fillHeight(false).children(spinnerControlDay, spinnerControlMonth, spinnerControlYear, button).spacing(25).alignment(Pos.CENTER).build();

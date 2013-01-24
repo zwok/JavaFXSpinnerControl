@@ -6,12 +6,15 @@ import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.ObservableList;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.control.LabelBuilder;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ScrollPaneBuilder;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -41,7 +44,7 @@ public class SpinnerControl extends AnchorPane {
     private void createLayout() {
         this.setStyle("-fx-background-color: transparent;");
         this.setPrefSize(50, 150);
- 
+
 
         Region rect1 = RegionBuilder.create().style("-fx-background-color: #000000").opacity(0.2).prefHeight(2).build();
         Region rect2 = RegionBuilder.create().style("-fx-background-color: #000000").opacity(0.8).prefHeight(2).build();
@@ -67,7 +70,21 @@ public class SpinnerControl extends AnchorPane {
     }
 
     private void registerBehaviour() {
+        valueScrollPane.setOnMouseReleased(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                goToItem(getItem());
+            }
+        });
 
+        valueScrollPane.addEventFilter(MouseEvent.MOUSE_DRAGGED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent mouseEvent) {
+                if (timeline.getStatus() == Animation.Status.RUNNING) {
+                    timeline.stop();
+                }
+            }
+        });
     }
 
     public ObservableList<String> getItems() {
@@ -91,21 +108,28 @@ public class SpinnerControl extends AnchorPane {
         for (String string : valueList) {
             if (string.compareTo(item) == 0) {
                 int valueIndex = valueList.indexOf(string);
-                double yPosInVBox = (valueIndex * itemHeight) + ((valueIndex) * valueVBox.getSpacing());
+                double yPosInVBox = valueIndex * (itemHeight + valueVBox.getSpacing()) + valueVBox.getSpacing();
                 double scrollV = yPosInVBox / (valueVBox.getHeight() - valueScrollPane.getHeight());
 
                 if (timeline.getStatus() == Animation.Status.RUNNING) {
                     timeline.stop();
                 }
                 KeyValue keyValue = new KeyValue(valueScrollPane.vvalueProperty(), scrollV, Interpolator.EASE_BOTH);
-                KeyFrame keyFrame = new KeyFrame(Duration.millis(500), keyValue);
+                KeyFrame keyFrame = new KeyFrame(Duration.millis(200), keyValue);
+                timeline.getKeyFrames().clear();
                 timeline.getKeyFrames().add(keyFrame);
-                timeline.play();
+                timeline.playFromStart();
             }
         }
     }
 
     public String getItem() {
+        double scrollV = valueScrollPane.getVvalue();
+        double yPosInVBox = scrollV * (valueVBox.getHeight() - valueScrollPane.getHeight()) - valueVBox.getSpacing();
+        int valueIndex = (int) ((yPosInVBox + itemHeight/2) / (itemHeight + valueVBox.getSpacing()));
+        if (valueIndex >= 0 && valueIndex < valueList.size()) {
+            return valueList.get(valueIndex);
+        }
         return "";
     }
 
@@ -133,7 +157,7 @@ public class SpinnerControl extends AnchorPane {
                     itemHeight = number1.doubleValue();
                     overlayVBox.setSpacing(itemHeight);
                     overlayVBox.setPadding(new Insets(itemHeight, 0, itemHeight, 0));
-                    setPrefHeight(itemHeight * 5 + 8);
+                    setPrefHeight(overlayVBox.getPrefHeight());
                 }
             });
         }
